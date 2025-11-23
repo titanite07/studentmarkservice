@@ -3,10 +3,11 @@ FROM maven:3.9.4-eclipse-temurin-21-alpine AS build
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
+RUN --mount=type=cache,target=/root/.m2 mvn dependency:copy-dependencies
 
 # Download dependencies only to cache them for later build stages
 # Download dependencies to the target/dependency directory for later build stages
-RUN mvn dependency:copy-dependencies
+# RUN mvn dependency:copy-dependencies
 
 # Package the application as a fat jar or a standard jar
 RUN mvn -X package -DskipTests
