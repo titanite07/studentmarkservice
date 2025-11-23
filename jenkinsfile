@@ -17,8 +17,8 @@ pipeline {
         }
         stage('Build') {
             steps {
-                // Build docker image using Dockerfile
-                bat "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} -f Dockerfile ."
+                // Build docker image using Dockerfile with host network
+                bat "docker build --network host -t ${IMAGE_NAME}:${IMAGE_TAG} -f Dockerfile ."
             }
         }
         /*
