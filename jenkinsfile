@@ -32,22 +32,21 @@ pipeline {
         }
         */
         stage('K8s Container Deployment') {
-            steps {
-                script {
-                    withEnv(["KUBECONFIG=c:/users/dmand/.kube/config"]) {
-                        // Replace variables in YAML and create concrete files:
-                        bat "envsubst < k8s/namespace-template.yaml > k8s/namespace.yaml"
-                        bat "envsubst < k8s/deployment-template.yaml > k8s/deployment.yaml"
-                        bat "envsubst < k8s/service-template.yaml > k8s/service.yaml"
-
-                        // Apply manifests
-                        bat "kubectl apply -f k8s/namespace.yaml --validate=false"
-                        bat "kubectl apply -f k8s/deployment.yaml --validate=false"
-                        bat "kubectl apply -f k8s/service.yaml --validate=false"
-                    }
-                }
+    steps {
+        script {
+            withCredentials([file(credentialsId: 'k8s-kubeconfig', variable: 'KUBECONFIG')]) {
+                bat """
+                    kubectl config view
+                    kubectl get nodes
+                    kubectl apply -f k8s/namespace.yaml --validate=false
+                    kubectl apply -f k8s/deployment.yaml --validate=false
+                    kubectl apply -f k8s/service.yaml --validate=false
+                """
             }
         }
+    }
+}
+
     }
     post {
         success {
